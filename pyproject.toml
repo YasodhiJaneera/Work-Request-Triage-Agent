@@ -1,0 +1,22 @@
+[project]
+name = "work-request-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "YasodhiJaneera", email = "janeerayasodhi@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "dotenv>=0.9.9",
+    "pydantic-ai>=2.51.0",
+    "pydantic-ai-slim[groq]>=2.51.0",
+    "python-dotenv>=1.2.3",
+]
+
+[project.scripts]
+work-request-agent = "work_request_agent:main"
+
+[build-system]
+requires = ["uv_build>=0.12.13,<0.13.0"]
+build-backend = "uv_build"
