@@ -3,22 +3,28 @@ from typing import Literal
 
 
 class ClarificationRequest(BaseModel):
-    
-    field:str = Field(
+    field: str = Field(
         description="The missing or conflict information"
     )
-    
-    question:str = Field(
-        description="A Question to ask from user"
-    )
-    
-    reason:str = Field(
-        description="Why this information needed"
-    )
-class PlanTask(BaseModel):
-    order: int = Field(ge=1)
 
-    task: str
+    question: str = Field(
+        description="A question to ask the user"
+    )
+
+    reason: str = Field(
+        description="Why this information is needed"
+    )
+
+
+class PlanTask(BaseModel):
+    order: int = Field(
+        ge=1,
+        description="The order of the task"
+    )
+
+    task: str = Field(
+        description="The task to be completed"
+    )
 
     priority: Literal[
         "high",
@@ -26,15 +32,22 @@ class PlanTask(BaseModel):
         "low",
     ]
 
-    rationale: str
+    rationale: str = Field(
+        description="Why this task is needed"
+    )
 
     depends_on: list[str] = Field(
-        default_factory=list
+        default_factory=list,
+        description="Tasks that must be completed first"
     )
+
+
 class WorkPlan(BaseModel):
     kind: Literal["plan"] = "plan"
 
-    goal: str
+    goal: str = Field(
+        description="The main goal of the work request"
+    )
 
     assumptions: list[str] = Field(
         default_factory=list
@@ -70,5 +83,6 @@ class WorkPlan(BaseModel):
     unresolved_optional_information: list[str] = Field(
         default_factory=list
     )
+
 
 TriageOutput = ClarificationRequest | WorkPlan

@@ -1,4 +1,4 @@
-from agent import triage_agent
+from .agent import triage_agent
 
 def main():
 
@@ -8,6 +8,7 @@ def main():
 
         result = triage_agent.run_sync(user_input,message_history=message_history)
         print(f"\nSystem >  {result}")
+        print(f"\nSystem >  {result.output}")
 
     message_history +=[
         {
