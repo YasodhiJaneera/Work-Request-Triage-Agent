@@ -59,11 +59,11 @@ when possible.
 triage_agent = Agent(
     agent_model,
     instructions=INSTRUCTIONS,
-    output_type=[
-    ClarificationRequest,
-    WorkPlan
-],
-)
+        output_type=[
+        ClarificationRequest,
+        WorkPlan
+    ],
+    )
 
 
 def main():
