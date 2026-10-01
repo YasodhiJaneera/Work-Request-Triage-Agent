@@ -2,17 +2,43 @@ from pydantic import BaseModel, Field
 from typing import Literal
 
 
-class ClarificationRequest(BaseModel):
+class ClarificationQuestion(BaseModel):
     field: str = Field(
-        description="The missing or conflict information"
+        description="The missing or conflicting information."
     )
 
     question: str = Field(
-        description="A question to ask the user"
+        description="A concise question to ask the user."
     )
 
     reason: str = Field(
-        description="Why this information is needed"
+        description="Why this information is needed."
+    )
+
+class ClarificationRequest(BaseModel):
+    kind: Literal["clarification"] = "clarification"
+
+    understood_goal: str = Field(
+        description="What the agent currently understands."
+    )
+
+    missing_critical_information: list[str] = Field(
+        min_length=1,
+        max_length=1,
+        description="Critical information required before planning.",
+    )
+
+    questions: list[ClarificationQuestion] = Field(
+        min_length=1,
+        max_length=1,
+        description="Minimal focused clarification questions.",
+    )
+
+    conflicts: list[str] = Field(
+        default_factory=list,
+            min_length=1,
+            max_length=1,
+        description="Conflicting requirements detected.",
     )
 
 

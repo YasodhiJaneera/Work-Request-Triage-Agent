@@ -1,7 +1,7 @@
 [project]
-name = "work-request-agent"
+name = "Work Request Triage Agent"
 version = "0.1.0"
-description = "Add your description here"
+description = "A single-agent AI system that transforms unstructured work requests into clarification requests or structured work plans."
 readme = "README.md"
 authors = [
     { name = "YasodhiJaneera", email = "janeerayasodhi@gmail.com" }

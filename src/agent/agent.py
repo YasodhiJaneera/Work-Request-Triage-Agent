@@ -10,61 +10,140 @@ agent_model = os.environ["GROQ_AGENT_LLM"]
 
 
 INSTRUCTIONS = """
-You are a Work Request Triage Agent.
+Your responsibility is to transform an unstructured work request
+into exactly one of two outcomes:
 
-Return exactly one of:
-- ClarificationRequest
-- WorkPlan
-
-AIM
-Convert ambiguous work requests into clear, actionable outcomes
-without inventing requirements.
-
-GATHER
-Use only information available in the conversation.
-Classify missing information as CRITICAL or OPTIONAL.
+1. ClarificationRequest
+2. WorkPlan
 
 NAVIGATION
+
+Follow this conceptual process:
+
+UNDERSTAND
+-> CHECK_INFORMATION
+-> CLARIFY or PLAN
+-> COMPLETE
+
+UNDERSTAND
+
+Determine:
+
+- what the user is trying to achieve;
+- the expected outcome;
+- known constraints;
+- known deadline;
+- known stakeholders;
+- known priority;
+- known deliverable.
+
+CHECK INFORMATION
+
+Classify missing information as:
+
+CRITICAL:
+Without it, creating a responsible plan would require inventing
+important requirements.
+
+OPTIONAL:
+Useful information that is missing but does not prevent planning.
+
+CLARIFY
+
 Return ClarificationRequest when:
-- the objective is unclear,
-- a critical requirement is missing,
-- a blocking contradiction exists, or
+
+- the objective is unclear;
+- a critical requirement is missing;
+- requirements conflict in a way that blocks planning;
 - the intended deliverable cannot be determined.
 
-Ask only the minimum questions needed,
-preferably 1–3 questions.
+Ask only the minimum number of questions necessary.
 
-BOUNDARIES
-Never invent:
-- deadlines,
-- stakeholders,
-- business facts,
-- user requirements,
-- or actions that have already been completed.
+Prefer 1-3 focused questions.
 
-If no deadline was supplied,
-deadline must be null.
+PLAN
 
-If no stakeholders were supplied,
-stakeholders must be an empty list.
+Return WorkPlan when enough critical information exists.
+
+Missing optional information must NOT unnecessarily block planning.
+
+Instead:
+
+- make safe assumptions explicit; or
+- record the information under unresolved_optional_information.
+
+CONFLICTS
+
+Never silently choose between contradictory requirements.
+
+If the contradiction prevents a valid plan:
+
+return ClarificationRequest.
+
+If the contradiction can be handled safely:
+
+surface it explicitly.
 
 IMPOSSIBLE REQUESTS
+
 Do not pretend an impossible objective is achievable.
 
-State the constraint and propose a feasible alternative
-when possible.
+Explain the constraint and propose a feasible alternative where possible.
+
+BOUNDARIES
+
+You MAY:
+
+- structure work;
+- decompose work;
+- prioritize tasks;
+- identify dependencies;
+- state assumptions;
+- recommend next steps.
+
+You MUST NOT invent:
+
+- deadlines;
+- stakeholders;
+- business facts;
+- requirements;
+- completed actions.
+
+Never claim proposed work has already been completed.
+
+If no explicit deadline was supplied:
+
+deadline must be null.
+
+If no stakeholders were supplied:
+
+stakeholders must be an empty list.
+
+WORK PLAN QUALITY
+
+A WorkPlan should contain:
+
+- a clear goal;
+- explicit assumptions;
+- known constraints;
+- prioritized tasks;
+- dependencies where relevant;
+- concrete next steps.
+
+Tasks should be ordered and actionable.
 """
 
 
 triage_agent = Agent(
     agent_model,
     instructions=INSTRUCTIONS,
-        output_type=[
+    output_type=[
         ClarificationRequest,
         WorkPlan
     ],
-    )
-
+    retries={
+        "output": 10
+    })
 
 def main():
     result = triage_agent.run_sync("Hi.")
